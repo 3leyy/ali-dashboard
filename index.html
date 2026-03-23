@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ali Dashboard">
+<meta name="theme-color" content="#0c0c12">
+<title>Ali — Dashboard</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230c0c12'/><text y='.9em' font-size='80' x='10'>⚡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="dark"]{
+  --bg:#0c0c12;--bg2:#13131e;--bg3:#1c1c2a;--bg4:#232336;
+  --border:#252535;--border2:#383850;
+  --text:#f0f0fa;--text2:#8888aa;--text3:#484860;
+  --gold:#f5c842;--gold-d:#c49a1e;--gold-bg:rgba(245,200,66,0.08);
+  --green:#2ecc8a;--green-bg:rgba(46,204,138,0.08);
+  --blue:#4d8fff;--blue-bg:rgba(77,143,255,0.08);
+  --purple:#9966ff;--purple-bg:rgba(153,102,255,0.08);
+  --orange:#ff8844;--red:#ff4455;
+  --shadow:rgba(0,0,0,0.4);
+}
+:root[data-theme="light"]{
+  --bg:#f2f2f7;--bg2:#ffffff;--bg3:#e8e8f0;--bg4:#dcdce8;
+  --border:#dcdce8;--border2:#c0c0d0;
+  --text:#0c0c18;--text2:#55556a;--text3:#9999b0;
+  --gold:#b8860b;--gold-d:#8b6508;--gold-bg:rgba(184,134,11,0.08);
+  --green:#1a7a52;--green-bg:rgba(26,122,82,0.08);
+  --blue:#1a5cc0;--blue-bg:rgba(26,92,192,0.08);
+  --purple:#6633cc;--purple-bg:rgba(102,51,204,0.08);
+  --orange:#cc5500;--red:#cc1122;
+  --shadow:rgba(0,0,0,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;transition:background .2s,color .2s;overflow-x:hidden;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--bg2);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 16px;gap:6px;padding-top:env(safe-area-inset-top);}
+.nav-brand{font-size:16px;font-weight:800;color:var(--text);margin-right:8px;white-space:nowrap;}
+.nav-brand em{color:var(--gold);font-style:normal;}
+.nav-tabs{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.ntab{padding:6px 13px;border-radius:8px;font-size:12px;font-weight:700;color:var(--text3);cursor:pointer;border:none;background:transparent;white-space:nowrap;transition:all .15s;letter-spacing:0.02em;}
+.ntab:hover{background:var(--bg3);color:var(--text2);}
+.ntab.active{background:var(--bg3);color:var(--text);}
+.ntab.active[data-p="perso"]{color:var(--gold);}
+.ntab.active[data-p="pro"]{color:var(--blue);}
+.ntab.active[data-p="finances"]{color:var(--green);}
+.ntab.active[data-p="bilan"]{color:var(--purple);}
+.theme-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* PAGES */
+.pages{margin-top:56px;padding-bottom:20px;}
+.page{display:none;padding:20px 16px;max-width:700px;margin:0 auto;}
+.page.active{display:block;}
+
+/* UTILS */
+.mono{font-family:'Space Mono',monospace;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.04em;}
+.section-hd{display:flex;align-items:center;gap:10px;margin:20px 0 10px;}
+.section-hd .ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.section-hd .ttl{font-size:15px;font-weight:700;color:var(--text);}
+.section-hd .cnt{margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:6px;border:1px solid var(--border);}
+
+/* WEEK NAV */
+.week-nav{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px;}
+.wday{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 3px 7px;text-align:center;cursor:pointer;transition:all .18s;}
+.wday:hover{border-color:var(--border2);}
+.wday.active{border-color:var(--gold);background:var(--gold-bg);}
+.wday.wend{border-color:var(--green-bg);}
+.wday.wend.active{border-color:var(--green);background:var(--green-bg);}
+.wday-n{font-family:'Space Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:.05em;margin-bottom:4px;}
+.wday.active .wday-n{color:var(--gold);}
+.wday.wend.active .wday-n{color:var(--green);}
+.wday-p{font-size:13px;font-weight:800;color:var(--text3);}
+.wday.active .wday-p{color:var(--text);}
+.wday-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:5px;overflow:hidden;}
+.wday-bf{height:100%;background:var(--gold);border-radius:2px;}
+.wday.wend .wday-bf{background:var(--green);}
+
+/* PROGRESS */
+.prog-row{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:18px;}
+.prog-num{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:var(--gold);white-space:nowrap;}
+.prog-num span{font-size:13px;color:var(--text3);}
+.prog-r{flex:1;}
+.prog-lbl{font-size:15px;font-weight:700;color:var(--text);margin-bottom:7px;}
+.prog-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+
+/* PRIÈRES */
+.prieres-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.priere-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 4px 9px;text-align:center;cursor:pointer;transition:all .18s;}
+.priere-card:hover{border-color:var(--border2);}
+.priere-card.done{background:var(--gold-bg);border-color:var(--gold);}
+.pc-name{font-family:'Space Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:.04em;margin-bottom:4px;}
+.priere-card.done .pc-name{color:var(--gold);}
+.pc-time{font-size:12px;font-weight:700;color:var(--text2);}
+.priere-card.done .pc-time{color:var(--gold);}
+.pc-chk{font-size:15px;margin-top:5px;color:var(--border2);}
+.priere-card.done .pc-chk{color:var(--gold);}
+
+/* PLAN ROWS */
+.plan-block{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:6px;}
+.plan-row{display:grid;grid-template-columns:64px 1fr 26px;align-items:center;gap:0;padding:13px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;position:relative;}
+.plan-row:last-child{border-bottom:none;}
+.plan-row:hover{background:var(--bg3);}
+.plan-row.done{background:var(--green-bg);}
+.plan-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.03em;}
+.plan-row.done .plan-time{color:var(--green);}
+.plan-cnt{padding:0 10px;}
+.plan-ttl{font-size:14px;font-weight:700;color:var(--text);line-height:1.2;}
+.plan-row.done .plan-ttl{color:var(--text3);text-decoration:line-through;}
+.plan-desc{font-size:11px;color:var(--text3);margin-top:2px;}
+.chkbox{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;flex-shrink:0;}
+.plan-row.done .chkbox{background:var(--green);border-color:var(--green);color:#000;font-weight:700;}
+.del-btn{display:none;position:absolute;right:44px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:4px;background:var(--red);color:#fff;border:none;font-size:11px;cursor:pointer;align-items:center;justify-content:center;}
+.plan-row:hover .del-btn{display:flex;}
+
+/* ADD TASK */
+.add-task-row{display:flex;gap:8px;margin-top:8px;}
+.add-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.add-input:focus{border-color:var(--border2);}
+.add-input::placeholder{color:var(--text3);}
+.add-btn{padding:10px 16px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:8px;transition:border-color .15s;}
+.card:hover{border-color:var(--border2);}
+.card-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.card-ttl{font-size:15px;font-weight:700;color:var(--text);flex:1;}
+.card-sub{font-size:12px;color:var(--text3);margin-bottom:10px;}
+
+/* STATUS BADGES */
+.status{padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;cursor:pointer;border:none;font-family:'Syne',sans-serif;}
+.s-todo{background:var(--bg3);color:var(--text3);}
+.s-doing{background:var(--blue-bg);color:var(--blue);}
+.s-blocked{background:rgba(255,68,85,0.1);color:var(--red);}
+.s-done{background:var(--green-bg);color:var(--green);}
+
+/* PROJECT TASKS */
+.proj-task{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .12s;border:1px solid transparent;margin-bottom:3px;}
+.proj-task:hover{background:var(--bg3);}
+.proj-task.done{background:var(--green-bg);border-color:rgba(46,204,138,0.12);}
+.proj-task .chkbox{flex-shrink:0;}
+.proj-task.done .chkbox{background:var(--green);border-color:var(--green);color:#000;font-weight:700;}
+.proj-task-lbl{font-size:13px;color:var(--text);flex:1;}
+.proj-task.done .proj-task-lbl{color:var(--text3);text-decoration:line-through;}
+.proj-task-dead{font-family:'Space Mono',monospace;font-size:9px;color:var(--text3);}
+.proj-task .del-btn{display:none;position:static;transform:none;width:18px;height:18px;flex-shrink:0;}
+.proj-task:hover .del-btn{display:flex;}
+
+/* PROGRESS BAR MINI */
+.mini-prog{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:8px;}
+.mini-prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s;}
+
+/* FINANCES */
+.fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.fin-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.fin-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+.fin-val{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--text);}
+.fin-val.pos{color:var(--green);}
+.fin-val.neg{color:var(--red);}
+
+.expense-row{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:5px;}
+.exp-cat{font-size:12px;font-weight:700;color:var(--text);flex:1;}
+.exp-desc{font-size:11px;color:var(--text3);}
+.exp-amt{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;}
+.exp-amt.out{color:var(--red);}
+.exp-amt.in{color:var(--green);}
+
+/* BILAN */
+.score-circle{width:100px;height:100px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;border:3px solid var(--gold);}
+.score-big{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:var(--gold);}
+.score-sub{font-size:10px;color:var(--text3);}
+
+.bilan-block{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+.bilan-q{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.bilan-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;resize:none;outline:none;transition:border-color .2s;line-height:1.5;}
+.bilan-ta:focus{border-color:var(--border2);}
+.bilan-ta::placeholder{color:var(--text3);}
+
+.score-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.sb-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+.sb-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.05em;margin-bottom:6px;}
+.sb-val{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;}
+
+/* NOTE AREA */
+.note-area{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;resize:none;outline:none;transition:border-color .2s;line-height:1.6;margin-top:6px;}
+.note-area:focus{border-color:var(--border2);}
+.note-area::placeholder{color:var(--text3);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 60px var(--shadow);}
+.modal h3{font-size:17px;font-weight:800;color:var(--text);margin-bottom:16px;}
+.modal-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;margin-bottom:10px;transition:border-color .2s;}
+.modal-input:focus{border-color:var(--border2);}
+.modal-input::placeholder{color:var(--text3);}
+.modal-btns{display:flex;gap:8px;margin-top:6px;}
+.btn{padding:10px 18px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-primary{background:var(--gold);color:#000;}
+.btn-primary:hover{opacity:.9;}
+.btn-secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--border2);}
+.btn-danger{background:rgba(255,68,85,0.1);color:var(--red);}
+
+/* DATE HEADER */
+.day-header{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;}
+.dh-day{font-size:18px;font-weight:800;color:var(--text);}
+.dh-date{font-family:'Space Mono',monospace;font-size:11px;color:var(--text3);margin-top:3px;}
+.dh-score{text-align:right;}
+.dh-pct{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--gold);}
+.dh-lbl{font-size:10px;color:var(--text3);margin-top:2px;}
+
+select.modal-input{-webkit-appearance:none;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">Ali <em>•</em></div>
+  <div class="nav-tabs">
+    <button class="ntab active" data-p="perso" onclick="showPage('perso')">⭐ Perso</button>
+    <button class="ntab" data-p="pro" onclick="showPage('pro')">⚡ Pro</button>
+    <button class="ntab" data-p="finances" onclick="showPage('finances')">💰 Finances</button>
+    <button class="ntab" data-p="bilan" onclick="showPage('bilan')">📊 Bilan</button>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()" title="Thème">☀</button>
+  </div>
+</nav>
+
+<div class="pages">
+
+<!-- ══════════════════════════════════════
+     PAGE PERSO
+══════════════════════════════════════ -->
+<div class="page active" id="page-perso">
+  <div class="week-nav" id="wn-perso"></div>
+  <div class="day-header">
+    <div>
+      <div class="dh-day" id="dh-day">—</div>
+      <div class="dh-date" id="dh-date">—</div>
+    </div>
+    <div class="dh-score">
+      <div class="dh-pct" id="dh-pct">0%</div>
+      <div class="dh-lbl">objectifs</div>
+    </div>
+  </div>
+  <div id="perso-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE PRO
+══════════════════════════════════════ -->
+<div class="page" id="page-pro">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div>
+      <div style="font-size:20px;font-weight:800;color:var(--text);">Projets <span style="color:var(--blue)">Dreamy</span></div>
+      <div class="mono" style="font-size:10px;color:var(--text3);margin-top:3px;">TABLEAU DE BORD PROJETS</div>
+    </div>
+    <button class="btn btn-primary" onclick="openAddProject()" style="font-size:12px;padding:8px 14px;">+ Projet</button>
+  </div>
+  <div id="pro-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE FINANCES
+══════════════════════════════════════ -->
+<div class="page" id="page-finances">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div>
+      <div style="font-size:20px;font-weight:800;color:var(--text);">Finances <span style="color:var(--green)">Perso</span></div>
+      <div class="mono" style="font-size:10px;color:var(--text3);margin-top:3px;" id="fin-month">—</div>
+    </div>
+    <button class="btn btn-primary" onclick="openAddExpense()" style="font-size:12px;padding:8px 14px;">+ Opération</button>
+  </div>
+  <div id="fin-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE BILAN
+══════════════════════════════════════ -->
+<div class="page" id="page-bilan">
+  <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;">Bilan <span style="color:var(--purple)">Semaine</span></div>
+  <div class="mono" style="font-size:10px;color:var(--text3);margin-bottom:20px;" id="bilan-week-label">—</div>
+  <div id="bilan-content"></div>
+</div>
+
+</div><!-- /pages -->
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Ajouter</h3>
+    <div id="modal-body"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" id="modal-confirm" onclick="modalConfirm()">Confirmer</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════
+// DATA & STATE
+// ══════════════════════════════════
+const DAYS_S = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const DAYS_F = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
+const SPORT_DAYS = [0,1,3,5];
+const WORK_DAYS  = [0,1,2,3,4];
+
+const PRIERES_DEF = [
+  {id:'fajr',name:'Fajr',time:'5h00'},
+  {id:'dohr',name:'Dohr',time:'Midi'},
+  {id:'asr',name:'Asr',time:'A-midi'},
+  {id:'maghreb',name:'Maghreb',time:'18h15'},
+  {id:'icha',name:'Icha',time:'22h20'},
+];
+
+const DEFAULT_PLAN_ITEMS = [
+  {id:'coran',time:'5h20',title:'Lecture du Coran',desc:'Au moins 1 page',days:'all',fixed:true},
+  {id:'travail1',time:'6h05',title:'3 priorités du jour',desc:'Écrire avant de partir',days:'work',fixed:true},
+  {id:'travail2',time:'7h30',title:'Tâches pro avancées',desc:'Dreamy / ARMEDY',days:'work',fixed:true},
+  {id:'sport',time:'19h00',title:'Musculation',desc:'1h — salle de sport',days:'sport',fixed:true},
+  {id:'famille',time:'20h40',title:'Temps en famille',desc:'Dîner + présence',days:'all',fixed:true},
+  {id:'gaming',time:'21h15',title:'Gaming',desc:'Max 45 min',days:'all',fixed:true},
+  {id:'bilan_day',time:'22h00',title:'Bilan du jour',desc:'5 min + 3 priorités demain',days:'all',fixed:true},
+];
+
+function loadData(){
+  try{ return JSON.parse(localStorage.getItem('ali_app_v1'))||{}; }
+  catch(e){ return {}; }
+}
+function saveData(d){ localStorage.setItem('ali_app_v1',JSON.stringify(d)); }
+
+let DB = loadData();
+if(!DB.perso) DB.perso = {};      // {weekKey: {dayIdx: {priere_id:bool, task_id:bool}}}
+if(!DB.planItems) DB.planItems = DEFAULT_PLAN_ITEMS; // keep custom tasks
+if(!DB.customTasks) DB.customTasks = {}; // {weekKey+dayIdx: [{id,title,time,desc}]}
+if(!DB.projects) DB.projects = [
+  {id:'p1',name:'BONGOLA Barre 37g',color:'gold',status:'doing',deadline:'Immédiat',
+   tasks:[{id:'t1',label:'Brief Badro — ajustements maquette',done:false},{id:'t2',label:'Validation proposition Badro',done:false}]},
+  {id:'p2',name:'BONGOLA Barre 18g + Seau',color:'blue',status:'todo',deadline:'Avant lancement',
+   tasks:[{id:'t1',label:'Brief Badro — déclinaison 18g',done:false},{id:'t2',label:'Concept design seau',done:false}]},
+  {id:'p3',name:'Poudre chocolat BONGOLA',color:'orange',status:'doing',deadline:'Très proche',
+   tasks:[{id:'t1',label:'Valider design boîte',done:false},{id:'t2',label:'Transposition image de marque',done:false}]},
+  {id:'p4',name:'Gaufrettes BONGOLA',color:'blue',status:'todo',deadline:'Avril 2026',
+   tasks:[{id:'t1',label:'Brief Badro packaging gaufrettes',done:false}]},
+  {id:'p5',name:'Gaufrettes GOODTIME',color:'purple',status:'todo',deadline:'Avril 2026',
+   tasks:[{id:'t1',label:'Meeting cadrage créatif',done:false},{id:'t2',label:'Brief Badro',done:false}]},
+  {id:'p6',name:'Machine Bühler EWB-Lizard',color:'green',status:'doing',deadline:'En cours',
+   tasks:[{id:'t1',label:'Questions envoyées à Saad',done:true},{id:'t2',label:'Attendre réponses + proforma',done:false}]},
+  {id:'p7',name:'Gamme DREAMY complète',color:'gold',status:'todo',deadline:'Oct 2026',
+   tasks:[{id:'t1',label:'Rétro-planning packaging',done:false}]},
+  {id:'p8',name:'ARMEDY Dubai',color:'blue',status:'blocked',deadline:'Post-Ramadan',
+   tasks:[{id:'t1',label:'Ouverture compte bancaire',done:false},{id:'t2',label:'Suivi contact sur place',done:false}]},
+];
+if(!DB.finances) DB.finances = {income:0,savings_target:15,entries:[]};
+if(!DB.bilans) DB.bilans = {};
+saveData(DB);
+
+// ══════════════════════════════════
+// WEEK KEY HELPERS
+// ══════════════════════════════════
+function getWeekKey(date){
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  const day = d.getDay();
+  const diff = d.getDate() - day;
+  const sun = new Date(d.setDate(diff));
+  return `${sun.getFullYear()}-${sun.getMonth()}-${sun.getDate()}`;
+}
+function getWeekDates(wk){
+  const parts = wk.split('-');
+  const sun = new Date(+parts[0],+parts[1],+parts[2]);
+  return Array.from({length:7},(_,i)=>{ const d=new Date(sun); d.setDate(sun.getDate()+i); return d; });
+}
+
+let currentDay = new Date().getDay();
+let currentWeekKey = getWeekKey(new Date());
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+let currentPage = 'perso';
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelector(`.ntab[data-p="${p}"]`).classList.add('active');
+  currentPage = p;
+  if(p==='perso') renderPerso();
+  if(p==='pro') renderPro();
+  if(p==='finances') renderFinances();
+  if(p==='bilan') renderBilan();
+}
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme', isDark?'light':'dark');
+  document.querySelector('.theme-btn').textContent = isDark?'🌙':'☀';
+}
+
+// ══════════════════════════════════
+// PERSO PAGE
+// ══════════════════════════════════
+function getDayState(wk, di){
+  if(!DB.perso[wk]) DB.perso[wk]={};
+  if(!DB.perso[wk][di]) DB.perso[wk][di]={};
+  return DB.perso[wk][di];
+}
+
+function getCheckableKeys(di){
+  const keys = PRIERES_DEF.map(p=>p.id);
+  keys.push('coran');
+  if(SPORT_DAYS.includes(di)) keys.push('sport');
+  keys.push('famille','gaming','bilan_day');
+  if(WORK_DAYS.includes(di)) keys.push('travail1','travail2');
+  // custom tasks
+  const ck = currentWeekKey+'_'+di;
+  if(DB.customTasks[ck]) DB.customTasks[ck].forEach(t=>keys.push('custom_'+t.id));
+  return keys;
+}
+
+function calcPct(wk, di){
+  const s = getDayState(wk,di);
+  const keys = getCheckableKeys(di);
+  const done = keys.filter(k=>s[k]).length;
+  return keys.length>0?Math.round(done/keys.length*100):0;
+}
+
+function togglePerso(key){
+  const s = getDayState(currentWeekKey, currentDay);
+  s[key] = !s[key];
+  saveData(DB);
+  renderPerso();
+}
+
+function renderWeekNavPerso(){
+  const wdates = getWeekDates(currentWeekKey);
+  document.getElementById('wn-perso').innerHTML = DAYS_S.map((n,i)=>{
+    const p = calcPct(currentWeekKey,i);
+    const we = i===5||i===6;
+    return `<div class="wday ${we?'wend':''} ${i===currentDay?'active':''}" onclick="switchDay(${i})">
+      <div class="wday-n">${n}</div>
+      <div class="wday-p">${p}%</div>
+      <div class="wday-bar"><div class="wday-bf" style="width:${p}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function switchDay(di){
+  currentDay = di;
+  renderPerso();
+}
+
+function renderPerso(){
+  renderWeekNavPerso();
+  const di = currentDay;
+  const wk = currentWeekKey;
+  const s  = getDayState(wk, di);
+  const keys = getCheckableKeys(di);
+  const done = keys.filter(k=>s[k]).length;
+  const pct  = keys.length>0?Math.round(done/keys.length*100):0;
+  const wdates = getWeekDates(wk);
+  const date = wdates[di];
+
+  document.getElementById('dh-day').textContent = DAYS_F[di];
+  document.getElementById('dh-date').textContent = `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+  document.getElementById('dh-pct').textContent = pct+'%';
+
+  let html = '';
+
+  // Prières
+  const prDone = PRIERES_DEF.filter(p=>s[p.id]).length;
+  html += `<div class="section-hd">
+    <div class="ico" style="background:var(--gold-bg);">🕌</div>
+    <div class="ttl">Les 5 Prières</div>
+    <div class="cnt">${prDone} / 5</div>
+  </div>
+  <div class="prieres-grid" style="margin-bottom:6px;">
+    ${PRIERES_DEF.map(p=>`
+      <div class="priere-card ${s[p.id]?'done':''}" onclick="togglePerso('${p.id}')">
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-time">${p.time}</div>
+        <div class="pc-chk">${s[p.id]?'✓':'○'}</div>
+      </div>`).join('')}
+  </div>`;
+
+  // Build plan rows for this day
+  const planItems = DB.planItems.filter(item=>{
+    if(item.days==='all') return true;
+    if(item.days==='work') return WORK_DAYS.includes(di);
+    if(item.days==='sport') return SPORT_DAYS.includes(di);
+    return true;
+  }).filter(item=>item.id!=='fajr'&&item.id!=='dohr'&&item.id!=='asr'&&item.id!=='maghreb'&&item.id!=='icha');
+
+  if(planItems.length>0){
+    html += `<div class="section-hd" style="margin-top:16px;">
+      <div class="ico" style="background:var(--blue-bg);">📋</div>
+      <div class="ttl">Planning du jour</div>
+    </div>
+    <div class="plan-block">
+      ${planItems.map(item=>`
+        <div class="plan-row ${s[item.id]?'done':''}" onclick="togglePerso('${item.id}')">
+          <div class="plan-time">${item.time}</div>
+          <div class="plan-cnt">
+            <div class="plan-ttl">${item.title}</div>
+            ${item.desc?`<div class="plan-desc">${item.desc}</div>`:''}
+          </div>
+          <div class="chkbox">${s[item.id]?'✓':''}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // Custom tasks
+  const ck = wk+'_'+di;
+  const customs = DB.customTasks[ck]||[];
+  html += `<div class="section-hd" style="margin-top:16px;">
+    <div class="ico" style="background:var(--purple-bg);">✏️</div>
+    <div class="ttl">Tâches personnalisées</div>
+    <div class="cnt">${customs.filter(t=>s['custom_'+t.id]).length} / ${customs.length}</div>
+  </div>`;
+  if(customs.length>0){
+    html += `<div class="plan-block">
+      ${customs.map(t=>`
+        <div class="plan-row ${s['custom_'+t.id]?'done':''}" onclick="togglePerso('custom_${t.id}')">
+          <div class="plan-time">${t.time||'—'}</div>
+          <div class="plan-cnt">
+            <div class="plan-ttl">${t.title}</div>
+            ${t.desc?`<div class="plan-desc">${t.desc}</div>`:''}
+          </div>
+          <button class="del-btn" onclick="event.stopPropagation();deleteCustomTask('${ck}','${t.id}')">✕</button>
+          <div class="chkbox">${s['custom_'+t.id]?'✓':''}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+  html += `<div class="add-task-row">
+    <input class="add-input" id="custom-task-input" placeholder="Ajouter une tâche..." onkeydown="if(event.key==='Enter')addCustomTask()">
+    <button class="add-btn btn-primary" onclick="addCustomTask()" style="background:var(--gold);color:#000;">Ajouter</button>
+  </div>`;
+
+  // Note
+  const noteKey = wk+'_'+di+'_note';
+  html += `<div class="section-hd" style="margin-top:16px;">
+    <div class="ico" style="background:rgba(255,136,68,0.1);">📝</div>
+    <div class="ttl">Note du jour</div>
+  </div>
+  <textarea class="note-area" rows="3" placeholder="Comment s'est passée ta journée ?"
+    oninput="saveNote(this.value)">${DB.perso[wk]&&DB.perso[wk][noteKey]||''}</textarea>`;
+
+  document.getElementById('perso-content').innerHTML = html;
+}
+
+function saveNote(val){
+  const key = currentWeekKey+'_'+currentDay+'_note';
+  if(!DB.perso[currentWeekKey]) DB.perso[currentWeekKey]={};
+  DB.perso[currentWeekKey][key] = val;
+  saveData(DB);
+}
+
+function addCustomTask(){
+  const inp = document.getElementById('custom-task-input');
+  const val = (inp&&inp.value||'').trim();
+  if(!val) return;
+  const ck = currentWeekKey+'_'+currentDay;
+  if(!DB.customTasks[ck]) DB.customTasks[ck]=[];
+  DB.customTasks[ck].push({id:'ct_'+Date.now(),title:val,time:'',desc:''});
+  saveData(DB);
+  renderPerso();
+}
+
+function deleteCustomTask(ck, tid){
+  if(!DB.customTasks[ck]) return;
+  DB.customTasks[ck] = DB.customTasks[ck].filter(t=>t.id!==tid);
+  saveData(DB);
+  renderPerso();
+}
+
+// ══════════════════════════════════
+// PRO PAGE
+// ══════════════════════════════════
+const STATUS_LABELS = {todo:'À FAIRE',doing:'EN COURS',blocked:'BLOQUÉ',done:'TERMINÉ'};
+const STATUS_CLASSES = {todo:'s-todo',doing:'s-doing',blocked:'s-blocked',done:'s-done'};
+const COLOR_MAP = {gold:'var(--gold)',blue:'var(--blue)',green:'var(--green)',purple:'var(--purple)',orange:'var(--orange)'};
+
+function cycleStatus(pid){
+  const p = DB.projects.find(x=>x.id===pid);
+  if(!p) return;
+  const cycle = ['todo','doing','blocked','done'];
+  const i = cycle.indexOf(p.status);
+  p.status = cycle[(i+1)%cycle.length];
+  saveData(DB);
+  renderPro();
+}
+
+function toggleProTask(pid, tid){
+  const p = DB.projects.find(x=>x.id===pid);
+  if(!p) return;
+  const t = p.tasks.find(x=>x.id===tid);
+  if(t) t.done=!t.done;
+  saveData(DB);
+  renderPro();
+}
+
+function deleteProTask(pid, tid){
+  const p = DB.projects.find(x=>x.id===pid);
+  if(!p) return;
+  p.tasks = p.tasks.filter(x=>x.id!==tid);
+  saveData(DB);
+  renderPro();
+}
+
+function deleteProject(pid){
+  DB.projects = DB.projects.filter(x=>x.id!==pid);
+  saveData(DB);
+  renderPro();
+}
+
+let _modalCtx = null;
+
+function openAddProject(){
+  _modalCtx = {type:'add_project'};
+  document.getElementById('modal-title').textContent = 'Nouveau projet';
+  document.getElementById('modal-body').innerHTML = `
+    <input class="modal-input" id="mi-name" placeholder="Nom du projet">
+    <input class="modal-input" id="mi-dead" placeholder="Deadline (ex: Avril 2026)">
+    <select class="modal-input" id="mi-color">
+      <option value="gold">Or</option>
+      <option value="blue">Bleu</option>
+      <option value="green">Vert</option>
+      <option value="purple">Violet</option>
+      <option value="orange">Orange</option>
+    </select>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function openAddProTask(pid){
+  _modalCtx = {type:'add_pro_task', pid};
+  document.getElementById('modal-title').textContent = 'Nouvelle tâche';
+  document.getElementById('modal-body').innerHTML = `
+    <input class="modal-input" id="mi-label" placeholder="Description de la tâche">
+    <input class="modal-input" id="mi-dead" placeholder="Deadline (optionnel)">`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function modalConfirm(){
+  if(!_modalCtx) return;
+  if(_modalCtx.type==='add_project'){
+    const name = document.getElementById('mi-name').value.trim();
+    if(!name) return;
+    DB.projects.push({
+      id:'p'+Date.now(), name,
+      color: document.getElementById('mi-color').value,
+      status:'todo',
+      deadline: document.getElementById('mi-dead').value||'—',
+      tasks:[]
+    });
+    saveData(DB); closeModal(); renderPro();
+  }
+  if(_modalCtx.type==='add_pro_task'){
+    const p = DB.projects.find(x=>x.id===_modalCtx.pid);
+    if(!p) return;
+    const label = document.getElementById('mi-label').value.trim();
+    if(!label) return;
+    p.tasks.push({id:'t'+Date.now(),label,done:false,deadline:document.getElementById('mi-dead').value||''});
+    saveData(DB); closeModal(); renderPro();
+  }
+  if(_modalCtx.type==='add_expense'){
+    const desc = document.getElementById('mi-desc').value.trim();
+    const amt  = parseFloat(document.getElementById('mi-amt').value)||0;
+    const type = document.getElementById('mi-type').value;
+    const cat  = document.getElementById('mi-cat').value;
+    if(!desc||!amt) return;
+    DB.finances.entries.push({id:'e'+Date.now(),desc,amount:amt,type,cat,date:new Date().toISOString()});
+    saveData(DB); closeModal(); renderFinances();
+  }
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  _modalCtx=null;
+}
+
+function renderPro(){
+  let html = '';
+  const total = DB.projects.length;
+  const doneP = DB.projects.filter(p=>p.status==='done').length;
+  html += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;">
+    ${[['todo','À faire',DB.projects.filter(p=>p.status==='todo').length,'var(--text3)'],
+       ['doing','En cours',DB.projects.filter(p=>p.status==='doing').length,'var(--blue)'],
+       ['blocked','Bloqués',DB.projects.filter(p=>p.status==='blocked').length,'var(--red)'],
+       ['done','Terminés',doneP,'var(--green)']].map(([_,lbl,cnt,col])=>`
+      <div class="fin-card">
+        <div class="fin-lbl">${lbl}</div>
+        <div class="fin-val" style="color:${col};font-size:22px;">${cnt}</div>
+      </div>`).join('')}
+  </div>`;
+
+  DB.projects.forEach(p=>{
+    const tdone = p.tasks.filter(t=>t.done).length;
+    const tpct  = p.tasks.length>0?Math.round(tdone/p.tasks.length*100):0;
+    const col   = COLOR_MAP[p.color]||'var(--gold)';
+    html += `<div class="card" style="border-left:3px solid ${col};margin-bottom:10px;">
+      <div class="card-hd">
+        <div class="card-ttl">${p.name}</div>
+        <button class="status ${STATUS_CLASSES[p.status]}" onclick="cycleStatus('${p.id}')">${STATUS_LABELS[p.status]}</button>
+        <button class="btn btn-danger" onclick="deleteProject('${p.id}')" style="margin-left:6px;padding:4px 8px;font-size:11px;border-radius:6px;">✕</button>
+      </div>
+      <div class="card-sub">📅 Deadline : ${p.deadline} &nbsp;·&nbsp; ${tdone}/${p.tasks.length} tâches</div>
+      <div class="mini-prog"><div class="mini-prog-fill" style="width:${tpct}%;background:${col};"></div></div>
+      <div style="margin-top:10px;">
+        ${p.tasks.map(t=>`
+          <div class="proj-task ${t.done?'done':''}" onclick="toggleProTask('${p.id}','${t.id}')">
+            <div class="chkbox">${t.done?'✓':''}</div>
+            <span class="proj-task-lbl">${t.label}</span>
+            ${t.deadline?`<span class="proj-task-dead">${t.deadline}</span>`:''}
+            <button class="del-btn" onclick="event.stopPropagation();deleteProTask('${p.id}','${t.id}')">✕</button>
+          </div>`).join('')}
+      </div>
+      <div class="add-task-row" style="margin-top:8px;">
+        <input class="add-input" id="ti-${p.id}" placeholder="Ajouter une tâche..." onkeydown="if(event.key==='Enter')addProTaskInline('${p.id}')">
+        <button class="add-btn btn-primary" onclick="addProTaskInline('${p.id}')" style="background:${col};color:#000;">+</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('pro-content').innerHTML = html;
+}
+
+function addProTaskInline(pid){
+  const inp = document.getElementById('ti-'+pid);
+  if(!inp) return;
+  const label = inp.value.trim();
+  if(!label) return;
+  const p = DB.projects.find(x=>x.id===pid);
+  if(!p) return;
+  p.tasks.push({id:'t'+Date.now(),label,done:false});
+  saveData(DB); renderPro();
+}
+
+// ══════════════════════════════════
+// FINANCES PAGE
+// ══════════════════════════════════
+function openAddExpense(){
+  _modalCtx={type:'add_expense'};
+  document.getElementById('modal-title').textContent = 'Nouvelle opération';
+  document.getElementById('modal-body').innerHTML = `
+    <input class="modal-input" id="mi-desc" placeholder="Description (ex: Courses, Salaire...)">
+    <input class="modal-input" id="mi-amt" type="number" placeholder="Montant (DA)">
+    <select class="modal-input" id="mi-type">
+      <option value="out">Dépense</option>
+      <option value="in">Revenu</option>
+      <option value="save">Épargne</option>
+    </select>
+    <select class="modal-input" id="mi-cat">
+      <option value="Alimentation">Alimentation</option>
+      <option value="Transport">Transport</option>
+      <option value="Loisirs">Loisirs</option>
+      <option value="Santé">Santé</option>
+      <option value="Vêtements">Vêtements</option>
+      <option value="Épargne">Épargne</option>
+      <option value="Revenus">Revenus</option>
+      <option value="Divers">Divers</option>
+    </select>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function deleteExpense(id){
+  DB.finances.entries = DB.finances.entries.filter(e=>e.id!==id);
+  saveData(DB); renderFinances();
+}
+
+function renderFinances(){
+  const now = new Date();
+  document.getElementById('fin-month').textContent = `${MONTHS[now.getMonth()].toUpperCase()} ${now.getFullYear()}`;
+  const entries = DB.finances.entries;
+  const income  = entries.filter(e=>e.type==='in').reduce((s,e)=>s+e.amount,0);
+  const expenses= entries.filter(e=>e.type==='out').reduce((s,e)=>s+e.amount,0);
+  const savings = entries.filter(e=>e.type==='save').reduce((s,e)=>s+e.amount,0);
+  const balance = income - expenses - savings;
+  const savePct = income>0?Math.round(savings/income*100):0;
+
+  let html = `<div class="fin-grid">
+    <div class="fin-card">
+      <div class="fin-lbl">Revenus</div>
+      <div class="fin-val pos">${income.toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;">DA</div>
+    </div>
+    <div class="fin-card">
+      <div class="fin-lbl">Dépenses</div>
+      <div class="fin-val neg">${expenses.toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;">DA</div>
+    </div>
+    <div class="fin-card">
+      <div class="fin-lbl">Épargne</div>
+      <div class="fin-val" style="color:var(--blue);">${savings.toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;">DA</div>
+    </div>
+  </div>`;
+
+  // Épargne progress
+  const targetPct = DB.finances.savings_target||15;
+  html += `<div class="bilan-block" style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);">Taux d'épargne</div>
+      <div style="font-family:'Space Mono',monospace;font-size:13px;color:${savePct>=targetPct?'var(--green)':'var(--orange)'};">${savePct}% / objectif ${targetPct}%</div>
+    </div>
+    <div class="prog-track">
+      <div class="prog-fill" style="width:${Math.min(savePct/targetPct*100,100)}%;background:${savePct>=targetPct?'var(--green)':'var(--orange)'};"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;">
+      <div style="font-size:12px;color:var(--text3);">Solde disponible</div>
+      <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:${balance>=0?'var(--green)':'var(--red)'};">${balance.toLocaleString()} DA</div>
+    </div>
+  </div>`;
+
+  if(entries.length===0){
+    html += `<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:14px;">Aucune opération — clique sur + Opération</div>`;
+  } else {
+    html += `<div class="section-hd"><div class="ico" style="background:var(--green-bg);">📋</div><div class="ttl">Historique</div></div>`;
+    [...entries].reverse().forEach(e=>{
+      html += `<div class="expense-row">
+        <div>
+          <div class="exp-cat">${e.desc}</div>
+          <div class="exp-desc">${e.cat} · ${new Date(e.date).toLocaleDateString('fr-FR')}</div>
+        </div>
+        <div class="exp-amt ${e.type==='in'?'in':e.type==='save'?'':''} ${e.type==='out'?'out':''}" style="${e.type==='save'?'color:var(--blue);':''}">
+          ${e.type==='in'?'+':'${e.type==="save"?'💰':'-'}'}${e.amount.toLocaleString()} DA
+        </div>
+        <button class="btn btn-danger" onclick="deleteExpense('${e.id}')" style="padding:4px 8px;font-size:11px;border-radius:6px;margin-left:8px;">✕</button>
+      </div>`;
+    });
+  }
+  document.getElementById('fin-content').innerHTML = html;
+}
+
+// ══════════════════════════════════
+// BILAN PAGE
+// ══════════════════════════════════
+function calcWeekScore(){
+  let totalKeys=0, doneKeys=0;
+  for(let di=0;di<7;di++){
+    const keys = getCheckableKeys(di);
+    const s = getDayState(currentWeekKey, di);
+    totalKeys += keys.length;
+    doneKeys  += keys.filter(k=>s[k]).length;
+  }
+  const persoPct = totalKeys>0?Math.round(doneKeys/totalKeys*100):0;
+  const proTotal = DB.projects.reduce((s,p)=>s+p.tasks.length,0);
+  const proDone  = DB.projects.reduce((s,p)=>s+p.tasks.filter(t=>t.done).length,0);
+  const proPct   = proTotal>0?Math.round(proDone/proTotal*100):0;
+  const score    = Math.round((persoPct+proPct)/2);
+  return {score, persoPct, proPct, doneKeys, totalKeys, proDone, proTotal};
+}
+
+function saveBilan(field, val){
+  if(!DB.bilans[currentWeekKey]) DB.bilans[currentWeekKey]={};
+  DB.bilans[currentWeekKey][field] = val;
+  saveData(DB);
+}
+
+function renderBilan(){
+  const wdates = getWeekDates(currentWeekKey);
+  const d1 = wdates[0], d7 = wdates[6];
+  document.getElementById('bilan-week-label').textContent =
+    `${d1.getDate()} ${MONTHS[d1.getMonth()]} → ${d7.getDate()} ${MONTHS[d7.getMonth()]} ${d7.getFullYear()}`;
+
+  const {score,persoPct,proPct,doneKeys,totalKeys,proDone,proTotal} = calcWeekScore();
+  const bilan = DB.bilans[currentWeekKey]||{};
+
+  const scoreColor = score>=80?'var(--green)':score>=60?'var(--gold)':score>=40?'var(--orange)':'var(--red)';
+  const scoreEmoji = score>=80?'★':score>=60?'◆':score>=40?'◈':'○';
+
+  let html = `<div style="text-align:center;margin-bottom:20px;">
+    <div style="width:110px;height:110px;border-radius:50%;border:3px solid ${scoreColor};display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 8px;">
+      <div style="font-family:'Space Mono',monospace;font-size:30px;font-weight:700;color:${scoreColor};">${score}</div>
+      <div style="font-size:10px;color:var(--text3);">/ 100</div>
+    </div>
+    <div style="font-size:16px;font-weight:800;color:var(--text);">Score de la semaine ${scoreEmoji}</div>
+  </div>
+
+  <div class="score-breakdown">
+    <div class="sb-card">
+      <div class="sb-lbl">PERSO</div>
+      <div class="sb-val" style="color:var(--gold);">${persoPct}%</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;">${doneKeys}/${totalKeys} objectifs</div>
+    </div>
+    <div class="sb-card">
+      <div class="sb-lbl">PRO</div>
+      <div class="sb-val" style="color:var(--blue);">${proPct}%</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;">${proDone}/${proTotal} tâches</div>
+    </div>
+  </div>`;
+
+  // Bilan questions
+  const questions = [
+    {key:'good', q:'✅ Ce qui a bien marché cette semaine', ph:'Victoires, habitudes tenues, progrès...'},
+    {key:'bad',  q:'⚠️ Ce qui a moins bien marché', ph:'Ce qui a raté, les obstacles...'},
+    {key:'top3', q:'🏆 Top 3 de la semaine', ph:'Les 3 meilleures choses de la semaine...'},
+    {key:'next', q:'🎯 Objectifs semaine prochaine', ph:'Ce que tu veux accomplir...'},
+  ];
+  questions.forEach(({key,q,ph})=>{
+    html += `<div class="bilan-block">
+      <div class="bilan-q">${q}</div>
+      <textarea class="bilan-ta" rows="3" placeholder="${ph}"
+        oninput="saveBilan('${key}',this.value)">${bilan[key]||''}</textarea>
+    </div>`;
+  });
+
+  // Poids
+  html += `<div class="bilan-block">
+    <div class="bilan-q">⚖️ Poids du lundi matin</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+      <input class="modal-input" type="number" style="width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;outline:none;"
+        placeholder="kg" value="${bilan.poids||''}" oninput="saveBilan('poids',this.value)">
+      <span style="font-size:13px;color:var(--text3);">kg — Objectif : 75 kg</span>
+    </div>
+  </div>`;
+
+  document.getElementById('bilan-content').innerHTML = html;
+}
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+renderPerso();
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e){
+  if(e.target===this) closeModal();
+});
+</script>
+</body>
+</html>
